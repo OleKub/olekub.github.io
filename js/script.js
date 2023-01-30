@@ -21,36 +21,55 @@ counters.forEach( (item, i) => {
     lines[i].style.width = item.innerHTML;
 });
 
-// page up arrow
+const scrolling = (upSelector) => {
+  const upElem = document.querySelector(upSelector);
 
-// $(document).ready(function(){
-// 	$(window).scroll(function() {
-// 		if ($(this).scrollTop() > 1600) {
-// 			$('.pageup').fadeIn();
-// 		} else $('.pageup').fadeOut();
-// 	});
-// });
-const btnUp = {
-    el: document.querySelector('.btn-pageup'),
-    show() {
-      this.el.classList.remove('btn-pageup_hide');
-    },
-    hide() {
-      this.el.classList.add('btn-pageup_hide');
-    },
-    addEventListener() {
-      window.addEventListener('scroll', () => {
-        const scrollY = window.scrollY || document.documentElement.scrollTop;
-        scrollY > 400 ? this.show() : this.hide();
-      });
-      document.querySelector('.btn-pageup').onclick = () => {
-        window.scrollTo({
-          top: 0,
-          left: 0,
-          behavior: 'smooth'
-        });
+    window.addEventListener('scroll', () => {
+      if (document.documentElement.scrollTop > 1250) {
+          upElem.classList.add('animated', 'fadeIn');
+          upElem.classList.remove('fadeOut');
+      } else {
+          upElem.classList.add('fadeOut');
+          upElem.classList.remove('fadeIn');
       }
-    }
-  }
-  
-  btnUp.addEventListener();
+  });
+};
+
+  // Scrolling with RequestAnimationFrame
+
+  let links = document.querySelectorAll('[href^="#"]'),
+      speed = 0.05;
+
+  links.forEach(link => {
+      link.addEventListener('click', function(event) {
+          event.preventDefault();
+
+          let widthTop = document.documentElement.scrollTop,
+              hash = this.hash,
+              toBlock = document.querySelector(hash).getBoundingClientRect().top,
+              start = null;
+
+          requestAnimationFrame(step);
+
+          function step(time) {
+              if (start === null) {
+                  start = time;
+              } 
+
+              let progress = time - start,
+                  r = (toBlock < 0 ? Math.max(widthTop - progress/speed, widthTop + toBlock) : 
+                      Math.min(widthTop + progress/speed, widthTop + toBlock));
+                  
+              document.documentElement.scrollTo(0, r);
+
+              if (r != widthTop + toBlock) {
+                  requestAnimationFrame(step);
+              } else {
+                  location.hash = hash;
+              }
+          }
+
+      });
+  });
+
+scrolling('.pageup');
